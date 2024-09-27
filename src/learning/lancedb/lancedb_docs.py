@@ -1,6 +1,9 @@
 import lancedb
 import pandas
 import pyarrow as pa
+from dotenv import load_dotenv
+
+assert load_dotenv("../../.env")
 
 uri = "data/sample-lancedb"
 async_db = await lancedb.connect_async(uri)
@@ -38,3 +41,39 @@ func = get_registry().get("openai").create(name="text-embedding-ada-002")
 class Words(LanceModel):
     text: str = func.SourceField()
     vector: Vector(func.ndims()) = func.VectorField()
+
+
+table = db.create_table("words", schema=Words, mode="overwrite")
+table.add([{"text": "hello world"}, {"text": "goodbye world"}])
+
+query = "greetings"
+actual = table.search(query).limit(1).to_pydantic(Words)[0]
+print(actual.text)
+
+# hybrid search
+import os
+
+import lancedb
+import openai
+from lancedb.embeddings import get_registry
+from lancedb.pydantic import LanceModel, Vector
+
+db = lancedb.connect("test.db")
+embeddings = get_registry().get("openai").create()
+
+
+class Documents(LanceModel):
+    vector: Vector(embeddings.ndims()) = embeddings.VectorField()
+    text: str = embeddings.SourceField()
+
+
+table = db.create_table("documents", schema=Documents, mode="overwrite")
+
+data = [
+    {"text": "rebel spaceships striking from a hidden base"},
+    {"text": "have won their first victory against the evil Galactic Empire"},
+    {"text": "during the battle rebel spies managed to steal secret plans"},
+    {"text": "to the Empire's ultimate weapon the Death Star"},
+]
+
+table.add(data)
