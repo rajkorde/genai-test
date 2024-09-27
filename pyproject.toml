@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "genai-test"
+version = "0.1.0"
+description = "Test code for various genai experiments"
+authors = ["Rajesh Korde <rajesh.korde@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+lancedb = "^0.13.0"
+sentence-transformers = "^3.1.1"
+wikipedia-api = "^0.7.1"
+tantivy = "^0.22.0"
+duckdb = "^1.1.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
