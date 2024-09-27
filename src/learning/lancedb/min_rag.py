@@ -1,3 +1,5 @@
+from unicodedata import category
+
 from wikipediaapi import Wikipedia
 
 wiki = Wikipedia("RAGBot/0.0", "en")
@@ -38,3 +40,10 @@ from lancedb.rerankers import CohereReranker
 reranker = CohereReranker()
 
 query = "What is Chihiro's new name given to her by the witch?"
+
+results = (
+    (tbl.search(query, query_type="hybrid"))
+    .where("category='film", prefilter=True)
+    .limit(10)
+    .rerank(reranker=reranker)
+)
