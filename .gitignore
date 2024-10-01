@@ -168,3 +168,4 @@ data
 .test
 temp*/*
 temp
+logs/

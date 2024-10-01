@@ -1,9 +1,3 @@
----
-title: "demo"
-format:
-  html:
-    code-fold: true
-jupyter: python3
----
+# GenAI-Test
 
-This is a test.
+Various experiments with GenAI
