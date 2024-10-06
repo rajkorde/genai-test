@@ -42,3 +42,26 @@ prediction = predict(
     question="What is the birth places of the parents who's sons founded Google"
 )
 print(prediction["answer"])
+lm.inspect_history(1)
+
+
+# Modules
+class ChainOfThoughtCustom(dspy.Module):
+    def __init__(self):
+        self.cot1 = dspy.ChainOfThought("question -> step_by_step_thought")
+        self.cot2 = dspy.ChainOfThought("question, thought -> answer")
+
+    def forward(self, question: str):
+        thought = self.cot1(question=question).step_by_step_thought
+        answer = self.cot2(question=question, thought=thought).answer
+        return dspy.Prediction(thought=thought, answer=answer)
+
+
+predict = ChainOfThoughtCustom()
+prediction = predict(
+    question="What is the birth places of the parents who's sons founded Google"
+)
+print(prediction["answer"])
+lm.inspect_history(1)
+
+# Outputting typed predictors
