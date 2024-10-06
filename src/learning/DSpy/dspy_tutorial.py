@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field
 
 assert load_dotenv("../../.env")
 
+# lm = dspy.OpenAI(model="openai/gpt-4o-mini")
 lm = dspy.LM(model="openai/gpt-4o-mini")
+
 dspy.settings.configure(lm=lm)
 
 
@@ -105,3 +107,51 @@ prediction = predict(
 )
 print(prediction.answer_list)
 lm.inspect_history(1)
+
+# RAG
+colbertv2_wiki17_abstracts = "http://20.102.90.50:2017/wiki17_abstracts"
+dspy.settings.configure(lm=lm, rm=colbertv2_wiki17_abstracts)
+
+# from dspy.datasets import HotPotQA
+
+# # Load the dataset.
+# dataset = HotPotQA(
+#     train_seed=1, train_size=20, eval_seed=2023, dev_size=50, test_size=0
+# )
+
+# # Tell DSPy that the 'question' field is the input. Any other fields are labels and/or metadata.
+# trainset = [x.with_inputs("question") for x in dataset.train]
+# devset = [x.with_inputs("question") for x in dataset.dev]
+
+# len(trainset), len(devset)
+
+
+class GenerateAnswer(dspy.Signature):
+    """Answer questions with short factoid answers."""
+
+    context = dspy.InputField(desc="may contain relevant facts")
+    question = dspy.InputField()
+    answer = dspy.OutputField(desc="often between 1 and 5 words")
+
+
+class RAG(dspy.Module):
+    def __init__(self, num_passages=5):
+        super().__init__()
+
+        self.retrieve = dspy.Retrieve(k=num_passages)
+        self.generate_answer = dspy.ChainOfThought(GenerateAnswer)
+
+    def forward(self, question):
+        context = self.retrieve(question).passages
+        prediction = self.generate_answer(context=context, question=question)
+        return dspy.Prediction(context=context, answer=prediction.answer)
+
+
+predict = RAG()
+prediction = predict(question="Who won 2021 T20 World cup final?")
+print(prediction.answer_list)
+lm.inspect_history(1)
+
+
+retrieve = dspy.Retrieve(k=3)
+obj = retrieve
