@@ -184,7 +184,7 @@ class RefreeAnswer(dspy.Signature):
     """Choose a card the referee shows, given a football situation"""
 
     question = dspy.InputField()
-    answer = dspy.OutputField(description="Choose between: Yellow card, Red card")
+    answer = dspy.OutputField(description="Choose between: Yellow, Red")
 
 
 class PredictionModel(dspy.Module):
@@ -210,3 +210,38 @@ evaluate_program = Evaluate(
     display_progress=True,
     display_table=True,
 )
+eval = evaluate_program(predict)
+
+
+from dspy.teleprompt import BootstrapFewShot
+
+teleprompter = BootstrapFewShot(metric=answer_exact_match, max_labeled_demos=10)
+compiled_predictor = teleprompter.compile(predict, trainset=trainset)
+
+evaluate_program = Evaluate(
+    devset=testset,
+    metric=answer_exact_match,
+    num_threads=8,
+    display_progress=True,
+    display_table=True,
+)
+eval = evaluate_program(compiled_predictor)
+
+
+class PredictionModelWithAssert(dspy.Module):
+    def __init__(self):
+        self.predict = dspy.ChainOfThought(RefreeAnswer)
+
+    def forward(self, question: str):
+        output = self.predict(question=question)
+        dspy.Suggest(
+            output.answer in ("Red", "Yellow"),
+            "Answer can only be one of: (Red, Yellow)",
+        )
+        return dspy.Prediction(answer=output.answer)
+
+
+predict_assert_model = PredictionModelWithAssert().activate_assertions()
+predict_assert_model(question="Potential offside on rebound")
+
+# Generating datasets
