@@ -245,3 +245,43 @@ predict_assert_model = PredictionModelWithAssert().activate_assertions()
 predict_assert_model(question="Potential offside on rebound")
 
 # Generating datasets
+
+
+class GenerateQuestion(dspy.Signature):
+    """Generate a simple trivia question from information"""
+
+    information = dspy.InputField()
+    question = dspy.OutputField(desc="Simple trivia question")
+    answer = dspy.OutputField(desc="Answer to trivia question. 1-3 words")
+
+
+import random
+
+
+def t() -> dict[str, float]:
+    return dict(temperature=(0.7 + 0.0001 * random.uniform(-1, 1)))
+
+
+class GenerateTrivia(dspy.Module):
+    def __init__(self):
+        self.retrieve = dspy.Retrieve(k=4)
+
+    def forward(self, query: str):
+        contexts = self.retrieve(query).passages
+        answers = []
+        for context in contexts:
+            output = dspy.ChainOfThought(GenerateQuestion, **t())(information=context)
+            answers.append(
+                {
+                    "context": context,
+                    "question": output.question,
+                    "answer": output.answer,
+                }
+            )
+        return answers
+
+
+trivia_generator = GenerateTrivia()
+trivia = []
+for f in ["Virat Kohli", "T20 World Cup", "Wicketkeeper", "fastest bowler", "Gabba"]:
+    trivia.append(trivia_generator(query=f))
