@@ -154,4 +154,59 @@ lm.inspect_history(1)
 
 
 retrieve = dspy.Retrieve(k=3)
-obj = retrieve
+obj = retrieve(query_or_queries="Francis ford coppola")
+
+
+# Few shot prompting
+import ast
+import random
+
+import dspy
+import pandas as pd
+
+df = pd.read_csv("data/soccer_card_situations.csv")
+
+trainset = df[:100]
+testset = df[100:]
+
+trainset = [
+    dspy.Example(question=x.question, answer=x.answer).with_inputs("question")
+    for x in trainset.itertuples()
+]
+
+testset = [
+    dspy.Example(question=x.question, answer=x.answer).with_inputs("question")
+    for x in testset.itertuples()
+]
+
+
+class RefreeAnswer(dspy.Signature):
+    """Choose a card the referee shows, given a football situation"""
+
+    question = dspy.InputField()
+    answer = dspy.OutputField(description="Choose between: Yellow card, Red card")
+
+
+class PredictionModel(dspy.Module):
+    def __init__(self):
+        self.predict = dspy.ChainOfThought(RefreeAnswer)
+
+    def forward(self, question: str):
+        return self.predict(question=question)
+
+
+predict = PredictionModel()
+prediction = predict(question="Spitting at the crowd")
+print(prediction.answer)
+lm.inspect_history(1)
+
+from dspy.evaluate import Evaluate
+from dspy.evaluate.metrics import answer_exact_match
+
+evaluate_program = Evaluate(
+    devset=testset,
+    metric=answer_exact_match,
+    num_threads=8,
+    display_progress=True,
+    display_table=True,
+)
