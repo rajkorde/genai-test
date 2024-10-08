@@ -2,7 +2,6 @@
 
 import dspy
 from dotenv import load_dotenv
-from dspy.datasets.gsm8k import GSM8K, gsm8k_metric
 from dspy.evaluate import Evaluate
 from dspy.teleprompt import BootstrapFewShot
 from pydantic import BaseModel, Field
@@ -109,7 +108,17 @@ print(prediction.answer_list)
 lm.inspect_history(1)
 
 # RAG
-colbertv2_wiki17_abstracts = "http://20.102.90.50:2017/wiki17_abstracts"
+import dspy
+
+colbertv2_wiki17_abstracts = dspy.ColBERTv2(
+    url="http://20.102.90.50:2017/wiki17_abstracts"
+)
+
+
+# turbo = dspy.OpenAI(model="gpt-3.5-turbo")
+# dspy.settings.configure(lm=turbo, rm=colbertv2_wiki17_abstracts)
+
+lm = dspy.LM(model="openai/gpt-4o-mini")
 dspy.settings.configure(lm=lm, rm=colbertv2_wiki17_abstracts)
 
 # from dspy.datasets import HotPotQA
@@ -148,8 +157,8 @@ class RAG(dspy.Module):
 
 
 predict = RAG()
-prediction = predict(question="Who won 2021 T20 World cup final?")
-print(prediction.answer_list)
+prediction = predict(question="Who won 2007 T20 World cup final?")
+print(prediction.answer)
 lm.inspect_history(1)
 
 
