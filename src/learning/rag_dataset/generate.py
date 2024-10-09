@@ -127,3 +127,25 @@ try:
         json.dump(pages, json_file)
 except Exception as e:
     print(f"Error writing to JSON file: {e}")
+
+
+# create text files for each city
+def read_json_to_dict(filepath: str) -> dict[str, str]:
+    try:
+        with open(filepath, "r") as file:
+            data = json.load(file)
+        return data
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error reading JSON file: {e}")
+        return {}
+
+
+cities = read_json_to_dict("data/pages.json")
+
+for k, v in cities.items():
+    filepath = f"data/{k.replace(" ", "_")}.txt"
+    try:
+        with open(filepath, "w") as file:
+            file.write(v)
+    except IOError as e:
+        print(f"Error writing to file: {e}")
