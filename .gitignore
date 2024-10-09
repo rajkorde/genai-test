@@ -169,3 +169,4 @@ data
 temp*/*
 temp
 logs/
+.DS_Store

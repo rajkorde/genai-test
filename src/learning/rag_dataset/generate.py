@@ -98,3 +98,32 @@ def download_wikipedia_page(title: str) -> str:
     except Exception as e:
         print(f"Error downloading page {title}: {e}")
         return ""
+
+
+cities = pd.read_csv("data/cities.csv")
+pages = {}
+for city in cities.itertuples():
+    city_name = city[1]
+    city_data = download_wikipedia_page(city_name)
+    print(f"{city_name} {len(city_data)}")
+    pages[city_name] = city_data
+
+cities_without_pages = [k for k, v in pages.items() if len(v) <= 10000]
+
+# Manually fixing some cities that didnt get data
+pages["San Jose"] = download_wikipedia_page("San Jose, California")
+pages["Austin"] = download_wikipedia_page("Austin, Texas")
+pages["Jacksonville"] = download_wikipedia_page("Jacksonville, Florida")
+pages["Fort Worth"] = download_wikipedia_page("Fort Worth, Texas")
+pages["Salvador"] = download_wikipedia_page("Salvador, Bahia")
+pages["Kano"] = download_wikipedia_page("Kano (city)")
+pages["George Town"] = download_wikipedia_page("George Town, Penang")
+pages["Kawasaki"] = download_wikipedia_page("Kawasaki, Kanagawa")
+
+cities_without_pages = [k for k, v in pages.items() if len(v) <= 10000]
+
+try:
+    with open("data/pages.json", "w") as json_file:
+        json.dump(pages, json_file)
+except Exception as e:
+    print(f"Error writing to JSON file: {e}")
