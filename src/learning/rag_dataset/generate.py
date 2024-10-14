@@ -143,9 +143,20 @@ def read_json_to_dict(filepath: str) -> dict[str, str]:
 cities = read_json_to_dict("data/pages.json")
 
 for k, v in cities.items():
-    filepath = f"data/{k.replace(" ", "_")}.txt"
+    filepath = f"data/text/{k.replace(" ", "_")}.txt"
     try:
         with open(filepath, "w") as file:
             file.write(v)
     except IOError as e:
         print(f"Error writing to file: {e}")
+
+
+# Shorten the pages to first
+SHORTEN_BY = 0.5
+# shorten each city pages by top 50% of the paragraphs and save it to short text location.
+short_city = {}
+for city in cities.keys():
+    city_data = cities[city].split("\n\n")
+    len_paragraphs = int(len(city_data) * SHORTEN_BY)
+    shortened = "\n\n".join(city_data[:len_paragraphs])
+    short_city[city] = shortened
