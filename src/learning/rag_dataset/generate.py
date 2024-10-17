@@ -160,3 +160,11 @@ for city in cities.keys():
     len_paragraphs = int(len(city_data) * SHORTEN_BY)
     shortened = "\n\n".join(city_data[:len_paragraphs])
     short_city[city] = shortened
+
+for k, v in short_city.items():
+    filepath = f"data/short_text/{k.replace(" ", "_")}.txt"
+    try:
+        with open(filepath, "w") as file:
+            file.write(v)
+    except IOError as e:
+        print(f"Error writing to file: {e}")

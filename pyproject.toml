@@ -8,7 +8,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
-lancedb = "^0.13.0"
 sentence-transformers = "^3.1.1"
 wikipedia-api = "^0.7.1"
 tantivy = "^0.22.0"
@@ -27,6 +26,9 @@ dspy-ai = "2.5.3"
 # ragas = "0.1.21"
 unstructured = "^0.15.13"
 cffi = "^1.17.1"
+crewai = "^0.70.1"
+crewai-tools = "^0.12.1"
+duckduckgo-search = "^6.3.2"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
