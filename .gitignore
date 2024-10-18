@@ -170,3 +170,5 @@ temp*/*
 temp
 logs/
 .DS_Store
+*.sqlite3
+db
