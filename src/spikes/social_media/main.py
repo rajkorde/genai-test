@@ -5,9 +5,9 @@ from crews import ChatCrew
 from dotenv import load_dotenv
 
 assert load_dotenv("../../../.env")
-os.environ["OPENAI_MODEL_NAME"] = ""
+os.environ["OPENAI_MODEL_NAME"] = "gpt-4o-mini"
 
-topic = "abortion"
+topic = "Forgiving student loans"
 TURN_COUNT = 3
 context = []
 filename = "outputs/context.txt"
@@ -32,8 +32,6 @@ for i in range(TURN_COUNT):
         context="\n".join(context),
     )
     context.append(f"Conservative: {response}")
-
-for c in context:
-    print(c)
+print("Done.")
 
 write_to_file(context, filename)

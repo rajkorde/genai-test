@@ -31,7 +31,7 @@ class ChatAgents:
             ),
             goal=dedent(
                 """Create a web query string that would yield the best results to respond in a debate setting for a given topic. Assume you belong to a specific political party. The query is generated using the debate topic and the past few points made in the debate.
-                You should not repeat what has already been discussed."""
+                """
             ),
             backstory=f"An opinionated political nerd from {party} party",
             verbose=True,
@@ -45,7 +45,11 @@ class ChatAgents:
             ),
             goal=dedent("""Provide a chat response to on a topic in 1-2 short sentences. Use the search query to get the top links. Read the links to create a chat reponse on a given topic. Assume you belong to a specific political party, factoring in the discussion so far.
             Dont repeat what has already been discussed.
-            Respond in first person"""),
+            Respond in first person.
+            Do NOT repeat points that have already been made so far.
+            Use historical facts and stats as needed.
+            Dont say things like 'its important to consider' or 'its vital to acknowledge' etc. Just state your case and offer rebuttals as needed.
+            """),
             backstory=f"An opinionated political nerd representing the {party} party.",
             tools=[web_search_top_results, WebsiteSearchTool()],
             verbose=True,

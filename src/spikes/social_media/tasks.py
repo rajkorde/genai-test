@@ -35,7 +35,10 @@ class ChatTasks:
                 The tone should be conversational, not formal.
                 Dont identity your political party. Just make a new counterpoint to discussion so far.
                 The response should be 1-2 short sentences.
+                Do not repeat the points that have already been made in the context.
                 Respond with just the response to the debate and nothing else.
+                Use historical facts and stats as needed.
+                Dont say things like 'its important to consider' or 'its vital to acknowledge' etc. Just state your case and offer rebuttals as needed.
 
                 Topic: {topic}
                 Site: {site}
