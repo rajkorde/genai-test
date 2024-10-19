@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from crewai import Agent  # type: ignore
+from crewai import LLM, Agent  # type: ignore
 from crewai_tools import WebsiteSearchTool, tool  # type: ignore
 from duckduckgo_search import DDGS
 
@@ -14,6 +14,16 @@ def web_search_top_results(topic: str, site: str) -> list[str]:
 
 
 class ChatAgents:
+    def __init__(self, use_openai: bool = True):
+        if use_openai:
+            self.llm = LLM(model="gpt-4o-mini", temperature=0.7)
+        else:
+            self.llm = LLM(
+                model="ollama/llama3.2",
+                base_url="http://localhost:11434",
+                temperature=0.7,
+            )
+
     def search_query_generator_agent(self, party: str) -> Agent:
         return Agent(
             role=dedent(
@@ -25,6 +35,7 @@ class ChatAgents:
             ),
             backstory=f"An opinionated political nerd from {party} party",
             verbose=True,
+            llm=self.llm,
         )
 
     def chat_response_agent(self, party: str):
@@ -32,10 +43,11 @@ class ChatAgents:
             role=dedent(
                 """A researcher who searches the web given a query and reads the links to create a response for the debate"""
             ),
-            goal=dedent("""Provide a chat response to on a topic in 1-3 sentences. Use the search query to get the top links. Read the links to create a chat reponse on a given topic. Assume you belong to a specific political party, factoring in the discussion so far.
+            goal=dedent("""Provide a chat response to on a topic in 1-2 short sentences. Use the search query to get the top links. Read the links to create a chat reponse on a given topic. Assume you belong to a specific political party, factoring in the discussion so far.
             Dont repeat what has already been discussed.
             Respond in first person"""),
             backstory=f"An opinionated political nerd representing the {party} party.",
             tools=[web_search_top_results, WebsiteSearchTool()],
             verbose=True,
+            llm=self.llm,
         )

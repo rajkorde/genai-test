@@ -5,11 +5,16 @@ from crewai import Agent, Task  # type: ignore
 
 class ChatTasks:
     def generate_search_query_task(
-        self, topic: str, context: str, party: str, agent: Agent
+        self,
+        topic: str,
+        context: str,
+        party: str,
+        agent: Agent,
     ) -> Task:
         return Task(
             description=dedent(f"""
                 Generate a web query string that would yield the best results to respond in a debate setting for a given topic. The query should be short (to be used for web search) and should help with the debate factoring in the topic and conversation so far. Assume you are representing a specific political party in the debate.
+                Respond with only the search query and nothing else.
 
                 Political Party: {party}
                 Topic: {topic}
@@ -29,7 +34,8 @@ class ChatTasks:
                 
                 The tone should be conversational, not formal.
                 Dont identity your political party. Just make a new counterpoint to discussion so far.
-                The response should be 1-3 short sentences. 
+                The response should be 1-2 short sentences.
+                Respond with just the response to the debate and nothing else.
 
                 Topic: {topic}
                 Site: {site}

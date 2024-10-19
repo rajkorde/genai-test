@@ -5,12 +5,10 @@ from crews import ChatCrew
 from dotenv import load_dotenv
 
 assert load_dotenv("../../../.env")
-
-os.environ["OPENAI_MODEL_NAME"] = "gpt-4o-mini"
-
+os.environ["OPENAI_MODEL_NAME"] = ""
 
 topic = "abortion"
-TURN_COUNT = 5
+TURN_COUNT = 3
 context = []
 filename = "outputs/context.txt"
 
@@ -37,15 +35,5 @@ for i in range(TURN_COUNT):
 
 for c in context:
     print(c)
-
-
-def write_to_file(strings: list[str], file_path: str) -> None:
-    try:
-        with open(file_path, "w") as file:
-            for string in strings:
-                file.write(string + "\n")
-    except OSError as e:
-        print(f"An error occurred while writing to the file: {e}")
-
 
 write_to_file(context, filename)
