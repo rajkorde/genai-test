@@ -25,7 +25,11 @@ class ChatTasks:
     ) -> Task:
         return Task(
             description=dedent(f"""
-                Generate a reponse to a topic under debate. Assume you are representing the point of view of a specific political party. Before responding, read the points made so far in the conversation indicated in the context. If the context is empty, then assume this is the start of the debate. After reading the context, research the site listed below and provide a short chat response to a topic under discussion. The response should be 1-3 sentences long.
+                Generate a reponse to a topic under debate. Assume you are representing the point of view of a specific political party. Before responding, read the points made so far in the conversation indicated in the context. If the context is empty, then assume this is the start of the debate. After reading the context, research the site listed below and provide a short chat response to a topic under discussion. 
+                
+                The tone should be conversational, not formal.
+                Dont identity your political party. Just make a new counterpoint to discussion so far.
+                The response should be 1-3 short sentences. 
 
                 Topic: {topic}
                 Site: {site}

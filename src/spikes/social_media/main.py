@@ -1,80 +1,51 @@
 import os
 
-from agents import ChatAgents
-from crewai import Crew  # type: ignore
+from chat_utils import write_to_file
+from crews import ChatCrew
 from dotenv import load_dotenv
-from tasks import ChatTasks
 
 assert load_dotenv("../../../.env")
 
 os.environ["OPENAI_MODEL_NAME"] = "gpt-4o-mini"
 
 
-## Test space
-
 topic = "abortion"
-# context = [
-#     "Abortion is morally wrong because it kills babies",
-#     "Abortion provides a way for women to manage their own care",
-# ]
+TURN_COUNT = 5
 context = []
-party = "conservative"
-site = "foxnews.com"
+filename = "outputs/context.txt"
 
-# party = "liberal"
-# site = "msnbc.com"
-
-query_agent = ChatAgents().search_query_generator_agent(party=party)
-query_task = ChatTasks().generate_search_query_task(
-    topic=topic, context="\n".join(context), party=party, agent=query_agent
-)
-chat_response_agent = ChatAgents().chat_response_agent(party=party)
-chat_response_task = ChatTasks().generate_chat_response_task(
+liberal_debater = ChatCrew(
     topic=topic,
-    site=site,
-    party=party,
-    context="\n".join(context),
-    agent=chat_response_agent,
+    party="liberal",
+    site="msnbc.com",
+)
+conservative_debater = ChatCrew(
+    topic=topic,
+    party="conservative",
+    site="foxnews.com",
 )
 
+for i in range(TURN_COUNT):
+    response = liberal_debater.get_response(
+        context="\n".join(context),
+    )
+    context.append(f"Liberal: {response}")
+    response = conservative_debater.get_response(
+        context="\n".join(context),
+    )
+    context.append(f"Conservative: {response}")
 
-crew = Crew(
-    agents=[query_agent, chat_response_agent],
-    tasks=[query_task, chat_response_task],
-    verbose=True,
-    memory=True,
-)
-response = crew.kickoff()
-
-
-# talkers
-
-
-# Step 2. Executing a simple search query
+for c in context:
+    print(c)
 
 
-# web_rag_tool = WebsiteSearchTool()
+def write_to_file(strings: list[str], file_path: str) -> None:
+    try:
+        with open(file_path, "w") as file:
+            for string in strings:
+                file.write(string + "\n")
+    except OSError as e:
+        print(f"An error occurred while writing to the file: {e}")
 
 
-# topic = "abortion"
-# sites = {
-#     "liberal": ["msnbc.com", "nytimes.com"],
-#     "neutral": ["twitter.com", "reddit.com"],
-#     "conservative": ["foxnews.com"],
-# }
-# conservative_site = sites["conservative"][0]
-# liberal_site = sites["liberal"][0]
-
-# #
-# crew = Crew(
-#     agents=[researcher],
-#     tasks=[
-#         ChatTasks().generate_chat_response_task(
-#             topic, conservative_site, "conservative", ""
-#         )
-#     ],
-#     verbose=True,
-#     memory=True,
-# )
-
-# response = crew.kickoff()
+write_to_file(context, filename)
